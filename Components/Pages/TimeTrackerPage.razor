@@ -1,0 +1,53 @@
+@page "/time-tracker"
+@rendermode InteractiveServer
+
+<PageTitle>Time Tracker</PageTitle>
+
+<h1>Time Tracker</h1>
+
+
+
+@if (isRunning)
+{
+    <p>Working on: @taskName</p>
+    <p>Phase: @phaseNumber</p>
+
+    <div>
+        <button @onclick="StopTimer">Stop</button>
+    </div>
+}
+else
+{
+    <div>
+        <label>Task</label>
+        <input @bind="taskName" />
+    </div>
+
+    <div>
+        <label>Phase Number</label>
+        <input @bind="phaseNumber" />
+    </div>
+
+    <div>
+        <button @onclick="StartTimer">Start</button>
+    </div>
+
+    <p>No timer currently running.</p>
+
+}
+
+@code {
+    private string taskName = string.Empty;
+    private string phaseNumber = string.Empty;
+    private bool isRunning;
+
+    private void StartTimer()
+    {
+        isRunning = true;
+    }
+
+    private void StopTimer()
+    {
+        isRunning = false;
+    }
+}
