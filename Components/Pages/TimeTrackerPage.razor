@@ -11,6 +11,11 @@
 {
     <p>Working on: @taskName</p>
     <p>Phase: @phaseNumber</p>
+    <p>Started: @startTime?.ToString("HH:mm:ss")</p>
+    @if (elapsedTime.HasValue)
+    {
+        <p>Elapsed: @elapsedTime.Value.ToString(@"hh\:mm\:ss")</p>
+    }
 
     <div>
         <button @onclick="StopTimer">Stop</button>
@@ -18,6 +23,7 @@
 }
 else
 {
+
     <div>
         <label>Task</label>
         <input @bind="taskName" />
@@ -34,20 +40,54 @@ else
 
     <p>No timer currently running.</p>
 
+    @if (elapsedTime.HasValue)
+    {
+        <p>Last task took: @elapsedTime.Value.ToString(@"hh\:mm\:ss")</p>
+    }
+
 }
 
 @code {
+
+    private System.Threading.Timer? timer;
+
+    private DateTime? startTime;
+    private TimeSpan? elapsedTime;
+
     private string taskName = string.Empty;
     private string phaseNumber = string.Empty;
     private bool isRunning;
 
     private void StartTimer()
     {
+        startTime = DateTime.Now;
         isRunning = true;
+
+        timer = new System.Threading.Timer(
+        _ => UpdateElapsedTime(),
+        null,
+        TimeSpan.Zero,
+        TimeSpan.FromSeconds(1));
     }
 
     private void StopTimer()
     {
+        timer?.Dispose();
+        timer = null;
+
+        if (startTime.HasValue)
+        {
+            elapsedTime = DateTime.Now - startTime.Value;
+        }
         isRunning = false;
+    }
+
+    private async void UpdateElapsedTime()
+    {
+        if (startTime.HasValue)
+        {
+            elapsedTime = DateTime.Now - startTime.Value;
+            await InvokeAsync(StateHasChanged);
+        }
     }
 }
