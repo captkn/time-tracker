@@ -1,5 +1,6 @@
 @page "/time-tracker"
 @rendermode InteractiveServer
+@using TimeTracker.Models
 
 <PageTitle>Time Tracker</PageTitle>
 
@@ -49,6 +50,8 @@ else
 
 @code {
 
+    private List<TimeEntry> timeEntries = new();
+
     private System.Threading.Timer? timer;
 
     private DateTime? startTime;
@@ -72,13 +75,25 @@ else
 
     private void StopTimer()
     {
+        DateTime endTime = DateTime.Now;
+
         timer?.Dispose();
         timer = null;
 
         if (startTime.HasValue)
         {
+            var entry = new TimeEntry
+            {
+                TaskName = taskName,
+                PhaseNumber = phaseNumber,
+                StartTime = startTime.Value,
+                EndTime = endTime
+            };
+
+            timeEntries.Add(entry);
             elapsedTime = DateTime.Now - startTime.Value;
         }
+        
         isRunning = false;
     }
 
